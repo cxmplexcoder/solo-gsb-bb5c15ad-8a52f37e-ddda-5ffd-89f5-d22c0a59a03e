@@ -1,0 +1,15 @@
+services:
+  kiln-cart:
+    build: .
+    image: kiln-cart-load-tracker:latest
+    container_name: kiln-cart-load-tracker
+    ports:
+      - "8000:8000"
+    environment:
+      PORT: "8000"
+      # 如需替换内置示例数据，把宿主机 JSON 挂载到该路径
+      SAMPLE_PATH: /srv/data/sample.json
+    volumes:
+      # 示例数据持久化/覆盖：容器启动时自动纳入
+      - ./data:/srv/data:ro
+    restart: unless-stopped

@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>陶瓷窑车层架载荷追踪台</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}" />
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">
+      <span class="brand-mark">窑</span>
+      <div>
+        <h1>陶瓷窑车层架载荷追踪台</h1>
+        <p>自下而上录入棚板与立柱 · 逐层向下分摊累加载荷 · 修改即整架重算</p>
+      </div>
+    </div>
+    <div class="top-actions">
+      <button id="btn-sample" class="btn" type="button">载入示例数据</button>
+      <button id="btn-export" class="btn" type="button">导出 JSON</button>
+      <span id="sync-state" class="sync-state">已同步</span>
+    </div>
+  </header>
+
+  <div id="error-banner" class="banner banner-error hidden"></div>
+  <div id="warning-banner" class="banner banner-warn hidden"></div>
+
+  <main class="layout">
+    <!-- ============ 左侧：录入 ============ -->
+    <section class="panel editor">
+      <h2>层架录入<span class="hint">（自下而上）</span></h2>
+
+      <div class="deck-box">
+        <div class="deck-title">窑车台面</div>
+        <div class="grid-3">
+          <label>宽 X<input type="number" step="any" id="deck-width" data-deck="width" /></label>
+          <label>深 Y<input type="number" step="any" id="deck-depth" data-deck="depth" /></label>
+          <label>重叠容差<input type="number" step="any" id="overlap-tol" data-deck="tolerance" value="0" /></label>
+        </div>
+      </div>
+
+      <div id="layers-editor"></div>
+
+      <button id="btn-add-layer" class="btn btn-add" type="button">＋ 在顶部增加一层</button>
+    </section>
+
+    <!-- ============ 右侧：视图与结果 ============ -->
+    <section class="panel views">
+      <div class="view-block">
+        <div class="view-head">
+          <h2>俯视图（X–Y 平面）</h2>
+          <div id="layer-filters" class="layer-filters"></div>
+        </div>
+        <div class="canvas-wrap">
+          <svg id="top-view" xmlns="http://www.w3.org/2000/svg"></svg>
+        </div>
+        <div class="legend">
+          <span><i class="lg lg-normal"></i>正常立柱</span>
+          <span><i class="lg lg-overload"></i>超载立柱</span>
+          <span><i class="lg lg-overlap"></i>落点重叠</span>
+          <span><i class="lg lg-float"></i>悬空立柱</span>
+          <span><i class="lg lg-shelf"></i>棚板</span>
+          <span><i class="lg lg-deck"></i>窑车台面</span>
+          <span class="legend-tip">点击立柱查看载荷来源</span>
+        </div>
+      </div>
+
+      <div class="view-block">
+        <div class="view-head">
+          <h2>侧视图</h2>
+          <div class="segmented">
+            <button type="button" data-side="xz" class="seg active">沿 Y 看（X–Z）</button>
+            <button type="button" data-side="yz" class="seg">沿 X 看（Y–Z）</button>
+          </div>
+        </div>
+        <div class="canvas-wrap">
+          <svg id="side-view" xmlns="http://www.w3.org/2000/svg"></svg>
+        </div>
+      </div>
+
+      <div class="view-block detail-block" id="detail-block">
+        <h2>立柱载荷来源</h2>
+        <div id="column-detail" class="column-detail">
+          <p class="placeholder">点击俯视图或侧视图中的立柱，此处展示该立柱分摊到的全部载荷来源。</p>
+        </div>
+      </div>
+
+      <div class="view-block">
+        <h2>逐层载荷汇总</h2>
+        <div class="table-wrap">
+          <table id="summary-table">
+            <thead>
+              <tr>
+                <th>层（自下而上）</th>
+                <th>棚板自重</th>
+                <th>坯件重量</th>
+                <th>上层压入</th>
+                <th>本层毛重</th>
+                <th>有效立柱</th>
+                <th>单柱反力</th>
+                <th>状态</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    载荷模型：每层毛重 = 棚板自重 + 坯件重量 + 上层有效立柱反力之和，由本层所有有效立柱平均分摊后逐层下传。
+  </footer>
+
+  <script src="{{ url_for('static', filename='app.js') }}"></script>
+</body>
+</html>
